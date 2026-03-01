@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+
+        <div class="shadow-lg p-5 rounded-4 bg-white">
+
+            <div class="mb-4">
+                <h3 class="fw-bold">Edit Homework</h3>
+                <p class="text-muted">Update homework details or replace the file</p>
+            </div>
+
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Title</label>
+                    <input type="text"
+                           name="title"
+                           class="form-control form-control-lg rounded-3"
+                           value="{{ homework.title }}"
+                           placeholder="Enter homework title"
+                           required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">Due Date</label>
+                    <input type="date"
+                           name="due_date"
+                           class="form-control form-control-lg rounded-3"
+                           value="{{ homework.due_date|date:'Y-m-d' }}"
+                           required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Replace File (Optional)
+                    </label>
+                    <input type="file"
+                           name="file"
+                           class="form-control form-control-lg rounded-3">
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit"
+                            class="btn btn-success btn-lg rounded-3">
+                        Update Homework
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

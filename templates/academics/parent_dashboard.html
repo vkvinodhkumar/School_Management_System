@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="mb-4">
+            <h2 class="fw-bold">Parent Dashboard</h2>
+        </div>
+
+        <!-- CHILD SELECTOR -->
+        {% if children.count > 1 %}
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <form method="get" class="d-flex align-items-center gap-3 flex-wrap">
+                <select name="child"
+                        class="form-select form-select-lg rounded-3"
+                        style="max-width:300px;">
+                    {% for c in children %}
+                        <option value="{{ c.id }}"
+                        {% if c.id|stringformat:"s" == selected_child_id %}selected{% endif %}>
+                            {{ c.full_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit"
+                        class="btn btn-primary btn-lg rounded-3">
+                    Switch
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Student Information -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-light">
+            <h4 class="fw-semibold mb-3">{{ child.full_name }}</h4>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>Admission No:</strong><br>
+                    {{ child.admission_number }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Class:</strong><br>
+                    {{ child.class_obj }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Section:</strong><br>
+                    {{ child.section }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Risk Alerts -->
+        {% if child.low_attendance %}
+            <div class="alert alert-warning rounded-3 shadow-sm">
+                Attendance is below 75%.
+            </div>
+        {% endif %}
+
+        {% if child.is_at_risk %}
+            <div class="alert alert-danger rounded-3 shadow-sm">
+                Academic performance is below average.
+            </div>
+        {% endif %}
+
+        <!-- Attendance & Marks -->
+        <div class="row mb-4">
+
+            <div class="col-md-6">
+                <div class="card text-center p-4 shadow-sm rounded-4 border-0">
+                    <h6 class="text-muted">Attendance</h6>
+                    <h2 class="fw-bold text-success">
+                        {{ attendance_percentage }}%
+                    </h2>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card text-center p-4 shadow-sm rounded-4 border-0">
+                    <h6 class="text-muted">Average Marks</h6>
+                    <h2 class="fw-bold text-primary">
+                        {{ average_marks }}%
+                    </h2>
+                </div>
+            </div>
+
+        </div>
+
+        <hr class="my-4">
+
+        <!-- Recent Homework -->
+        <h4 class="fw-semibold mb-3">Recent Homework</h4>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Title</th>
+                            <th>Actions</th>
+                            <th>Deadline</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for hw in homework %}
+                        <tr>
+                            <td class="fw-semibold">{{ hw.title }}</td>
+
+                            <td>
+                                {% if hw.file %}
+                                    <a href="{{ hw.file.url }}"
+                                       target="_blank"
+                                       class="btn btn-sm btn-primary rounded-3 me-2">
+                                        View
+                                    </a>
+
+                                    <a href="{{ hw.file.url }}"
+                                       download
+                                       class="btn btn-sm btn-success rounded-3">
+                                        Download
+                                    </a>
+                                {% else %}
+                                    <span class="text-muted">
+                                        No File
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>{{ hw.due_date }}</td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-muted text-center py-4">
+                                No Homework Available
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

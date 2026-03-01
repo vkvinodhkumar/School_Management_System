@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+
+        <div class="mb-4">
+            <h2 class="fw-bold">Teacher Dashboard</h2>
+        </div>
+
+        <!-- Assigned Subjects -->
+        <div class="card border-0 shadow-sm rounded-4 mb-4">
+
+            <div class="card-header bg-primary text-white rounded-top-4">
+                <h5 class="mb-0">Assigned Subjects</h5>
+            </div>
+
+            <div class="card-body">
+
+                <ul class="list-group list-group-flush">
+
+                    {% for subject in assigned_subjects %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>
+                            <strong>{{ subject.subject.name }}</strong>
+                            <span class="text-muted">
+                                (Class: {{ subject.class_obj.name }})
+                            </span>
+                        </span>
+                    </li>
+
+                    {% empty %}
+                    <li class="list-group-item text-muted">
+                        No subjects assigned
+                    </li>
+                    {% endfor %}
+
+                </ul>
+
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+
+            <h5 class="mb-3 fw-semibold">Quick Actions</h5>
+
+            <div class="d-flex flex-wrap gap-3">
+
+                <a href="{% url 'teacher_mark_attendance' %}"
+                   class="btn btn-success btn-lg rounded-3 px-4">
+                    Mark Attendance
+                </a>
+
+                <a href="{% url 'teacher_enter_marks' %}"
+                   class="btn btn-info btn-lg rounded-3 px-4 text-white">
+                    Enter Marks
+                </a>
+
+                <a href="{% url 'upload_homework' %}"
+                   class="btn btn-warning btn-lg rounded-3 px-4">
+                    Upload Homework
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

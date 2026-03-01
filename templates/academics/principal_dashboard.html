@@ -1,0 +1,187 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="col-12">
+
+        <div class="mb-4">
+            <h2 class="fw-bold">Principal Dashboard</h2>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <div class="d-flex gap-3 flex-wrap">
+                <a href="{% url 'principal_class_list' %}"
+                   class="btn btn-primary btn-lg rounded-3">
+                    Manage Classes
+                </a>
+
+                <a href="{% url 'principal_reports' %}"
+                   class="btn btn-info btn-lg rounded-3 text-white">
+                    View Reports
+                </a>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4 g-4">
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center">
+                    <h6 class="text-muted">Total Students</h6>
+                    <h3 class="fw-bold">{{ total_students }}</h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center">
+                    <h6 class="text-muted">Total Teachers</h6>
+                    <h3 class="fw-bold">{{ total_teachers }}</h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center">
+                    <h6 class="text-muted">Total Classes</h6>
+                    <h3 class="fw-bold">{{ total_classes }}</h3>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center">
+                    <h6 class="text-muted">Today Attendance</h6>
+                    <h3 class="fw-bold text-success">
+                        {{ today_attendance_percent }}%
+                    </h3>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Admission Status Cards -->
+        <div class="row mb-4 g-4">
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-success text-white">
+                    <h6>Approved</h6>
+                    <h3 class="fw-bold">{{ approved_students }}</h3>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-warning">
+                    <h6>Pending</h6>
+                    <h3 class="fw-bold">{{ pending_students }}</h3>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm rounded-4 p-4 text-center bg-danger text-white">
+                    <h6>Rejected</h6>
+                    <h3 class="fw-bold">{{ rejected_students }}</h3>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Admission Applications Table -->
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h4 class="fw-semibold mb-3">Admission Applications</h4>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Student</th>
+                            <th>Parent</th>
+                            <th>Class</th>
+                            <th>Section</th>
+                            <th>Status</th>
+                            <th>Application No</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for app in applications %}
+                        <tr>
+
+                            <td class="fw-semibold">{{ app.student_name }}</td>
+                            <td>{{ app.parent_name }}</td>
+
+                            <td>
+                                {% if app.class_obj %}
+                                    {{ app.class_obj.name }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if app.section %}
+                                    {{ app.section.name }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if app.status == "PENDING" %}
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                        Pending
+                                    </span>
+                                {% elif app.status == "APPROVED" %}
+                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                        Approved
+                                    </span>
+                                {% elif app.status == "REJECTED" %}
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">
+                                        Rejected
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if app.admission_number %}
+                                    {{ app.admission_number }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if app.status == "PENDING" %}
+                                    <a href="{% url 'approve_application' app.id %}"
+                                       class="btn btn-success btn-sm rounded-3 me-2">
+                                        Approve
+                                    </a>
+
+                                    <a href="{% url 'reject_application' app.id %}"
+                                       class="btn btn-danger btn-sm rounded-3">
+                                        Reject
+                                    </a>
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                No Applications Found
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

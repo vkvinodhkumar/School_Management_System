@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-9">
+
+        <div class="mb-4">
+            <h2 class="fw-bold">Attendance</h2>
+        </div>
+
+        <!-- Today's Status -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 text-center">
+            <h5 class="text-muted mb-3">Today's Status</h5>
+
+            {% if today_record %}
+                {% if today_record.status == "Present" %}
+                    <span class="badge bg-success rounded-pill px-4 py-2 fs-6">
+                        Present
+                    </span>
+                {% else %}
+                    <span class="badge bg-danger rounded-pill px-4 py-2 fs-6">
+                        Absent
+                    </span>
+                {% endif %}
+            {% else %}
+                <span class="badge bg-secondary rounded-pill px-4 py-2 fs-6">
+                    Not Marked Today
+                </span>
+            {% endif %}
+        </div>
+
+        <!-- Attendance Percentage -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 text-center">
+            <h5 class="text-muted">Attendance Percentage</h5>
+            <h2 class="fw-bold text-primary">
+                {{ percentage }}%
+            </h2>
+        </div>
+
+        <!-- Month Filter -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <form method="get" class="d-flex align-items-center gap-3 flex-wrap">
+
+                <select name="month"
+                        class="form-select form-select-lg rounded-3"
+                        style="max-width:250px;">
+
+                    <option value="all">All Months</option>
+
+                    <option value="1" {% if selected_month == "1" %}selected{% endif %}>January</option>
+                    <option value="2" {% if selected_month == "2" %}selected{% endif %}>February</option>
+                    <option value="3" {% if selected_month == "3" %}selected{% endif %}>March</option>
+                    <option value="4" {% if selected_month == "4" %}selected{% endif %}>April</option>
+                    <option value="5" {% if selected_month == "5" %}selected{% endif %}>May</option>
+                    <option value="6" {% if selected_month == "6" %}selected{% endif %}>June</option>
+                    <option value="7" {% if selected_month == "7" %}selected{% endif %}>July</option>
+                    <option value="8" {% if selected_month == "8" %}selected{% endif %}>August</option>
+                    <option value="9" {% if selected_month == "9" %}selected{% endif %}>September</option>
+                    <option value="10" {% if selected_month == "10" %}selected{% endif %}>October</option>
+                    <option value="11" {% if selected_month == "11" %}selected{% endif %}>November</option>
+                    <option value="12" {% if selected_month == "12" %}selected{% endif %}>December</option>
+
+                </select>
+
+                <button type="submit"
+                        class="btn btn-primary btn-lg rounded-3">
+                    Filter
+                </button>
+
+            </form>
+        </div>
+
+        <!-- Attendance History -->
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h4 class="fw-semibold mb-3">Attendance History</h4>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for record in attendance_history %}
+                        <tr>
+                            <td>{{ record.date }}</td>
+                            <td>
+                                {% if record.status == "Present" %}
+                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                        Present
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">
+                                        Absent
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="2" class="text-muted py-4">
+                                No attendance records
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

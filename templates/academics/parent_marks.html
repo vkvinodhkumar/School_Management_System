@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+
+        <div class="mb-4">
+            <h2 class="fw-bold">Subject-wise Marks</h2>
+        </div>
+
+        {% if children|length > 1 %}
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <form method="get" class="d-flex align-items-center gap-3 flex-wrap">
+                <select name="child"
+                        class="form-select form-select-lg rounded-3"
+                        style="max-width:300px;">
+                    {% for c in children %}
+                        <option value="{{ c.id }}"
+                            {% if c.id|stringformat:"s" == selected_child_id %}selected{% endif %}>
+                            {{ c.full_name }}
+                        </option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit"
+                        class="btn btn-primary btn-lg rounded-3">
+                    Switch
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- Student Info Card -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-light">
+            <h4 class="fw-semibold mb-3">{{ child.full_name }}</h4>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>Admission No:</strong><br>
+                    {{ child.admission_number }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Class:</strong><br>
+                    {{ child.class_obj }}
+                </div>
+                <div class="col-md-4">
+                    <strong>Section:</strong><br>
+                    {{ child.section }}
+                </div>
+            </div>
+        </div>
+
+        <!-- Marks Table -->
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <div class="table-responsive">
+                <table class="table table-hover text-center align-middle">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Subject</th>
+                            <th>Exam</th>
+                            <th>Marks</th>
+                            <th>Max Marks</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for mark in marks %}
+                        <tr>
+                            <td class="fw-semibold">{{ mark.subject.name }}</td>
+                            <td>{{ mark.exam.name }}</td>
+                            <td>{{ mark.marks }}</td>
+                            <td>{{ mark.exam.max_marks }}</td>
+                            <td>
+                                {% widthratio mark.marks mark.exam.max_marks 100 as percent %}
+                                
+                                {% if percent < 40 %}
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">
+                                        {{ percent }}%
+                                    </span>
+                                {% elif percent < 75 %}
+                                    <span class="badge bg-warning text-dark rounded-pill px-3 py-2">
+                                        {{ percent }}%
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                        {{ percent }}%
+                                    </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-muted py-4">
+                                No marks available
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

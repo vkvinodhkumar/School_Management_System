@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-7">
+
+        <div class="shadow-lg p-5 rounded-4 bg-white">
+
+            <div class="mb-4">
+                <h3 class="fw-bold">Edit Marks</h3>
+                <p class="text-muted">
+                    Update the marks for the selected student
+                </p>
+            </div>
+
+            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4 bg-light">
+                <div class="fw-semibold">
+                    {{ mark.student.admission_number }} -
+                    {{ mark.student.full_name }}
+                </div>
+                <div class="text-muted mt-1">
+                    {{ mark.subject.name }} |
+                    {{ mark.exam.name }}
+                </div>
+            </div>
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <div class="mb-4">
+                    <label class="form-label fw-semibold">
+                        Marks (Out of {{ mark.exam.max_marks }})
+                    </label>
+                    <input type="number"
+                           name="marks"
+                           value="{{ mark.marks }}"
+                           class="form-control form-control-lg rounded-3"
+                           max="{{ mark.exam.max_marks }}"
+                           required>
+                </div>
+
+                <div class="d-grid">
+                    <button class="btn btn-success btn-lg rounded-3">
+                        Update
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

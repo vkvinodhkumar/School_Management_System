@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>EduFlow ERP</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+
+        body {
+            background: linear-gradient(135deg, #eef2f7, #f8fafc);
+            font-family: 'Segoe UI', sans-serif;
+            min-height: 100vh;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            background: linear-gradient(90deg, #0f172a, #1e293b) !important;
+            padding: 14px 30px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 22px;
+            letter-spacing: 1px;
+            color: #ffffff !important;
+        }
+
+        .nav-link {
+            font-weight: 500;
+            color: #cbd5e1 !important;
+            margin-right: 14px;
+            padding: 8px 14px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255,255,255,0.08);
+            color: #ffffff !important;
+        }
+
+        /* BUTTONS */
+        .btn {
+            border-radius: 8px;
+            padding: 6px 16px;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .btn-warning {
+            background-color: #f59e0b;
+            border: none;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #d97706;
+        }
+
+        .btn-danger {
+            background-color: #ef4444;
+            border: none;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        /* USER INFO */
+        .user-info {
+            background: rgba(255,255,255,0.08);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        /* CONTENT CARD */
+        .card-style {
+            background: white;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.05);
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* TABLE */
+        .table {
+            background: white;
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .table thead {
+            background: linear-gradient(90deg, #0f172a, #1e293b);
+            color: white;
+            font-weight: 500;
+        }
+
+        .table-hover tbody tr:hover {
+            background-color: #f1f5f9;
+        }
+
+        /* BADGE */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        h2, h3, h4 {
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        /* RESPONSIVE */
+        @media(max-width: 768px){
+            .navbar {
+                padding: 12px;
+            }
+            .card-style {
+                padding: 20px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+
+        <a class="navbar-brand" href="#">EduFlow</a>
+
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto">
+
+                {% if user.is_authenticated %}
+
+                    {% if user.role == "PRINCIPAL" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'principal_dashboard' %}">
+                                Dashboard
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.role == "TEACHER" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'teacher_dashboard' %}">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'teacher_mark_attendance' %}">
+                                Attendance
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'teacher_enter_marks' %}">
+                                Marks
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'upload_homework' %}">
+                                Homework
+                            </a>
+                        </li>
+                        <li class="nav-item">
+    <a class="nav-link" href="{% url 'view_submissions' %}">
+        Submissions
+    </a>
+</li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'upload_question_paper' %}">
+                                Question Paper
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.role == "STUDENT" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'student_dashboard' %}">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'student_attendance' %}">
+                                Attendance
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'student_marks' %}">
+                                Marks
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'student_homework' %}">
+                                Homework
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'student_question_papers' %}">
+                                Question Papers
+                            </a>
+                        </li>
+                    {% endif %}
+
+                    {% if user.role == "PARENT" %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'parent_dashboard' %}">
+                                Dashboard
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'parent_attendance' %}?child={{ child.id }}">
+                                Attendance
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'parent_marks' %}?child={{ child.id }}">
+                                Marks
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'download_report' %}?child={{ child.id }}">
+                                Download Report
+                            </a>
+                        </li>
+                    {% endif %}
+
+                {% endif %}
+            </ul>
+
+            {% if user.is_authenticated %}
+
+                <div class="user-info text-white me-3">
+                    {{ request.user.first_name|default:request.user.username }}
+                </div>
+
+                <div class="user-info text-white me-3">
+                    {{ user.email }}
+                </div>
+
+                <a href="{% url 'change_password' %}"
+                   class="btn btn-warning btn-sm me-2">
+                    Change Password
+                </a>
+
+                <a href="{% url 'logout' %}"
+                   class="btn btn-danger btn-sm">
+                    Logout
+                </a>
+
+            {% endif %}
+
+        </div>
+    </div>
+</nav>
+
+<div class="container mt-5">
+    <div class="card-style">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+
+</body>
+</html>

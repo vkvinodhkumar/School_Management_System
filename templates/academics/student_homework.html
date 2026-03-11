@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+
+        <div class="mb-4">
+            <h2 class="fw-bold">Homework</h2>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Title</th>
+                            <th>File</th>
+                            <th>Submission</th>
+                            <th>Due Date</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for hw in homeworks %}
+                        <tr>
+
+                            <td class="fw-semibold">
+                                {{ hw.title }}
+                            </td>
+
+                            <td>
+                                <a href="{{ hw.file.url }}"
+                                   target="_blank"
+                                   class="btn btn-success btn-sm rounded-3 me-2">
+                                    View
+                                </a>
+
+                                <a href="{{ hw.file.url }}"
+                                   download
+                                   class="btn btn-secondary btn-sm rounded-3">
+                                    Download
+                                </a>
+                            </td>
+
+                            <td>
+
+                                {% if hw.id in submitted_homework_ids %}
+
+                                    <span class="badge bg-success rounded-pill px-3 py-2 mb-2">
+                                        Submitted
+                                    </span>
+                                    <br>
+
+                                    <a href="{% url 'submit_homework' hw.id %}"
+                                       class="btn btn-warning btn-sm rounded-3 me-2">
+                                        Re-Upload
+                                    </a>
+
+                                    <a href="{% url 'delete_submission' hw.id %}"
+                                       class="btn btn-danger btn-sm rounded-3">
+                                        Delete
+                                    </a>
+
+                                {% else %}
+
+                                    <a href="{% url 'submit_homework' hw.id %}"
+                                       class="btn btn-primary btn-sm rounded-3">
+                                        Submit
+                                    </a>
+
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+                                {{ hw.due_date }}
+                            </td>
+
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-muted py-4">
+                                No homework available.
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

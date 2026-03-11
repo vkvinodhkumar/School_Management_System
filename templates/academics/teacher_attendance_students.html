@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+
+        <div class="mb-4">
+            <h2 class="fw-bold">Mark Attendance</h2>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+
+            <form method="post">
+                {% csrf_token %}
+
+                <input type="hidden" name="class_id" value="{{ class_id }}">
+                <input type="hidden" name="section_id" value="{{ section_id }}">
+                <input type="hidden" name="date" value="{{ date }}">
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th class="text-start">Student</th>
+                                <th>Present</th>
+                                <th>Absent</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td class="text-start fw-semibold">
+                                    {{ student.full_name }}
+                                </td>
+
+                                <td>
+                                    <input type="radio"
+                                           class="form-check-input"
+                                           name="status_{{ student.id }}"
+                                           value="PRESENT"
+                                           required>
+                                </td>
+
+                                <td>
+                                    <input type="radio"
+                                           class="form-check-input"
+                                           name="status_{{ student.id }}"
+                                           value="ABSENT"
+                                           required>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <div class="text-end mt-4">
+                    <button type="submit"
+                            class="btn btn-success btn-lg rounded-3 px-4">
+                        Save Attendance
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

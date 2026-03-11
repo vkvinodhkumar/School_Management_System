@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-lg-11">
+
+        <div class="mb-4">
+            <h2 class="fw-bold">Mark Attendance</h2>
+        </div>
+
+        <!-- SELECT CLASS + DATE -->
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <form method="POST" class="row g-4">
+                {% csrf_token %}
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Select Class</label>
+                    <select name="assignment_id"
+                            class="form-select form-select-lg rounded-3"
+                            required>
+                        <option value="">Select</option>
+                        {% for a in assignments %}
+                        <option value="{{ a.id }}">
+                            {{ a.class_obj.name }} - {{ a.section.name }} - {{ a.subject.name }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold">Date</label>
+                    <input type="date"
+                           name="date"
+                           class="form-control form-control-lg rounded-3"
+                           required>
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit"
+                            class="btn btn-primary btn-lg rounded-3 w-100">
+                        Load Students
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- STUDENT LIST -->
+        {% if students %}
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+
+            <form method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="assignment_id" value="{{ selected_assignment.id }}">
+                <input type="hidden" name="date" value="{{ selected_date }}">
+                <input type="hidden" name="submit_attendance" value="1">
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle text-center">
+
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Register No</th>
+                                <th>Name</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {% for student in students %}
+                            <tr>
+                                <td>{{ student.admission_number }}</td>
+                                <td class="fw-semibold">{{ student.full_name }}</td>
+                                <td>
+                                    <select name="status_{{ student.id }}"
+                                            class="form-select form-select-sm rounded-3">
+                                        <option value="Present">Present</option>
+                                        <option value="Absent">Absent</option>
+                                    </select>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <div class="text-end mt-3">
+                    <button class="btn btn-success btn-lg rounded-3 px-4">
+                        Submit Attendance
+                    </button>
+                </div>
+
+            </form>
+        </div>
+        {% endif %}
+
+        <!-- ATTENDANCE HISTORY -->
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+            <h4 class="fw-semibold mb-3">Attendance History</h4>
+
+            <div class="table-responsive">
+                <table class="table table-hover align-middle text-center">
+
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Date</th>
+                            <th>Register No</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Edit</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for record in attendance_history %}
+                        <tr>
+                            <td>{{ record.date }}</td>
+                            <td>{{ record.student.admission_number }}</td>
+                            <td class="fw-semibold">{{ record.student.full_name }}</td>
+                            <td>
+                                {% if record.status == "Present" %}
+                                    <span class="badge bg-success rounded-pill px-3 py-2">
+                                        Present
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-danger rounded-pill px-3 py-2">
+                                        Absent
+                                    </span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'edit_attendance' record.id %}"
+                                   class="btn btn-warning btn-sm rounded-3">
+                                    Edit
+                                </a>
+                            </td>
+                        </tr>
+
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="text-muted py-4">
+                                No attendance records yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}

@@ -2,165 +2,333 @@
 {% block content %}
 
 <div class="row justify-content-center">
-    <div class="col-lg-11">
+<div class="col-lg-11">
 
-        <div class="mb-4">
-            <h2 class="fw-bold">Enter Marks</h2>
-        </div>
-
-        <!-- Error Message -->
-        {% if error %}
-        <div class="alert alert-danger rounded-3 shadow-sm">
-            {{ error }}
-        </div>
-        {% endif %}
-
-        <!-- Marks Entry Form -->
-        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-
-            <form method="POST">
-                {% csrf_token %}
-
-                <div class="row g-4">
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Student</label>
-                        <select name="student_id"
-                                class="form-select form-select-lg rounded-3"
-                                required>
-                            <option value="">Select Student</option>
-                            {% for s in students %}
-                            <option value="{{ s.id }}">
-                                {{ s.admission_number }} - {{ s.full_name }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Subject</label>
-                        <select name="subject_id"
-                                class="form-select form-select-lg rounded-3"
-                                required>
-                            <option value="">Select Subject</option>
-                            {% for sub in subjects %}
-                            <option value="{{ sub.id }}">
-                                {{ sub.name }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Exam</label>
-                        <select name="exam_id"
-                                class="form-select form-select-lg rounded-3"
-                                required>
-                            <option value="">Select Exam</option>
-                            {% for e in exams %}
-                            <option value="{{ e.id }}">
-                                {{ e.name }} (Out of {{ e.max_marks }})
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="col-md-6">
-                        <label class="form-label fw-semibold">Marks</label>
-                        <input type="number"
-                               name="marks"
-                               class="form-control form-control-lg rounded-3"
-                               required>
-                    </div>
-
-                </div>
-
-                <div class="text-end mt-4">
-                    <button type="submit"
-                            class="btn btn-primary btn-lg rounded-3 px-4">
-                        Save Marks
-                    </button>
-                </div>
-
-            </form>
-        </div>
-
-        <!-- Saved Marks Section -->
-        <div class="card border-0 shadow-sm rounded-4 p-4">
-
-            <h4 class="fw-semibold mb-3">Saved Marks</h4>
-
-            <!-- FILTER -->
-            <form method="GET" class="mb-4">
-                <label class="form-label fw-semibold">Filter by Student</label>
-                <select name="student"
-                        class="form-select rounded-3"
-                        onchange="this.form.submit()">
-                    <option value="">All</option>
-                    {% for s in students %}
-                    <option value="{{ s.id }}">
-                        {{ s.admission_number }} - {{ s.full_name }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </form>
-
-            <div class="table-responsive">
-                <table class="table table-hover align-middle text-center">
-
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Register No</th>
-                            <th>Name</th>
-                            <th>Subject</th>
-                            <th>Exam</th>
-                            <th>Marks</th>
-                            <th>Out Of</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-                        {% for m in saved_marks %}
-                        <tr>
-                            <td>{{ m.student.admission_number }}</td>
-                            <td class="fw-semibold">{{ m.student.full_name }}</td>
-                            <td>{{ m.subject.name }}</td>
-                            <td>{{ m.exam.name }}</td>
-                            <td>
-                                <span class="badge bg-primary rounded-pill px-3 py-2">
-                                    {{ m.marks }}
-                                </span>
-                            </td>
-                            <td>{{ m.exam.max_marks }}</td>
-                            <td>
-                                <a href="{% url 'edit_mark' m.id %}"
-                                   class="btn btn-warning btn-sm rounded-3 me-2">
-                                    Edit
-                                </a>
-
-                                <a href="{% url 'delete_mark' m.id %}"
-                                   class="btn btn-danger btn-sm rounded-3">
-                                    Delete
-                                </a>
-                            </td>
-                        </tr>
-
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-muted py-4">
-                                No marks entered yet
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-
-                </table>
-            </div>
-
-        </div>
-
-    </div>
+<div class="mb-4">
+<h2 class="fw-bold">Enter Marks</h2>
 </div>
+
+{% if error %}
+<div class="alert alert-danger rounded-3 shadow-sm">
+{{ error }}
+</div>
+{% endif %}
+
+
+<!-- SELECT CLASS -->
+
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+
+<form method="GET">
+
+<div class="row g-4">
+
+<div class="col-md-6">
+
+<label class="form-label fw-semibold">
+Select Class
+</label>
+
+<select name="section_id"
+class="form-select form-select-lg rounded-3"
+onchange="this.form.submit()">
+
+<option value="">
+Select Class
+</option>
+
+{% for s in sections %}
+
+<option value="{{ s.id }}"
+{% if selected_section and selected_section.id == s.id %}selected{% endif %}>
+
+{{ s.class_obj.name }} - {{ s.name }}
+
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+</div>
+
+</form>
+
+</div>
+
+
+
+<!-- MARK ENTRY -->
+
+<div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+
+<form method="POST">
+
+{% csrf_token %}
+
+<input type="hidden"
+name="section_id"
+value="{% if selected_section %}{{ selected_section.id }}{% endif %}">
+
+<div class="row g-4">
+
+<div class="col-md-6">
+
+<label class="form-label fw-semibold">
+Student
+</label>
+
+<select name="student_id"
+class="form-select form-select-lg rounded-3"
+required>
+
+<option value="">
+Select Student
+</option>
+
+{% for s in students %}
+
+<option value="{{ s.id }}">
+{{ s.admission_number }} - {{ s.full_name }}
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+
+
+<div class="col-md-6">
+
+<label class="form-label fw-semibold">
+Subject
+</label>
+
+<select name="subject_id"
+class="form-select form-select-lg rounded-3"
+required>
+
+<option value="">
+Select Subject
+</option>
+
+{% for sub in subjects %}
+
+<option value="{{ sub.id }}">
+{{ sub.name }}
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+
+
+<div class="col-md-6">
+
+<label class="form-label fw-semibold">
+Exam
+</label>
+
+<select name="exam_id"
+class="form-select form-select-lg rounded-3"
+required>
+
+<option value="">
+Select Exam
+</option>
+
+{% for e in exams %}
+
+<option value="{{ e.id }}">
+{{ e.name }} (Out of {{ e.max_marks }})
+</option>
+
+{% endfor %}
+
+</select>
+
+</div>
+
+
+
+<div class="col-md-6">
+
+<label class="form-label fw-semibold">
+Marks
+</label>
+
+<input type="number"
+name="marks"
+class="form-control form-control-lg rounded-3"
+required>
+
+</div>
+
+</div>
+
+<div class="text-end mt-4">
+
+<button type="submit"
+class="btn btn-primary btn-lg rounded-3 px-4">
+
+Save Marks
+
+</button>
+
+</div>
+
+</form>
+
+</div>
+
+
+
+<!-- SAVED MARKS -->
+
+<div class="card border-0 shadow-sm rounded-4 p-4">
+
+<h4 class="fw-semibold mb-3">
+Saved Marks
+</h4>
+
+
+<!-- SEARCH BOX -->
+
+<div class="mb-4">
+
+<label class="form-label fw-semibold">
+Search Student
+</label>
+
+<input type="text"
+id="studentSearch"
+class="form-control rounded-3"
+placeholder="Type student name or register number...">
+
+</div>
+
+
+<div class="table-responsive">
+
+<table class="table table-hover align-middle text-center">
+
+<thead class="table-dark">
+
+<tr>
+
+<th>Register No</th>
+<th>Name</th>
+<th>Subject</th>
+<th>Exam</th>
+<th>Marks</th>
+<th>Out Of</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+
+{% for m in saved_marks %}
+
+<tr class="student-row">
+
+<td>{{ m.student.admission_number }}</td>
+
+<td class="fw-semibold">
+{{ m.student.full_name }}
+</td>
+
+<td>{{ m.subject.name }}</td>
+
+<td>{{ m.exam.name }}</td>
+
+<td>
+
+<span class="badge bg-primary rounded-pill px-3 py-2">
+{{ m.marks }}
+</span>
+
+</td>
+
+<td>{{ m.exam.max_marks }}</td>
+
+<td>
+
+<a href="{% url 'edit_mark' m.id %}"
+class="btn btn-warning btn-sm rounded-3 me-2">
+
+Edit
+
+</a>
+
+<a href="{% url 'delete_mark' m.id %}"
+class="btn btn-danger btn-sm rounded-3">
+
+Delete
+
+</a>
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+
+<td colspan="7" class="text-muted py-4">
+No marks entered yet
+</td>
+
+</tr>
+
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+</div>
+
+
+
+<script>
+
+document.getElementById("studentSearch").addEventListener("keyup", function(){
+
+let filter = this.value.toLowerCase();
+
+let rows = document.querySelectorAll(".student-row");
+
+rows.forEach(function(row){
+
+let text = row.innerText.toLowerCase();
+
+if(text.includes(filter)){
+row.style.display = "";
+}else{
+row.style.display = "none";
+}
+
+});
+
+});
+
+</script>
+
 
 {% endblock %}

@@ -98,6 +98,11 @@ class Student(models.Model):
         return round(total / marks.count(), 2)
     def is_at_risk(self):
         return self.calculate_average() < 40
+    
+    class Meta:
+        indexes = [
+            models.Index(fields=["class_obj", "section"])
+        ]
 
 class Subject(models.Model):
     name = models.CharField(max_length=100)
@@ -118,15 +123,19 @@ class AttendanceRecord(models.Model):
         on_delete=models.CASCADE,
         related_name="attendance_records"
     )
+
     date = models.DateField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
+
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES
+    )
 
     class Meta:
         unique_together = ("student", "date")
 
     def __str__(self):
-        return f"{self.student} - {self.date} - {self.status}"
-
+        return f"{self.student.full_name} - {self.date}"
 class TeacherSubjectAssignment(models.Model):
 
     teacher = models.ForeignKey(
@@ -164,20 +173,7 @@ class AttendanceSession(models.Model):
         return f"{self.class_obj.name} - {self.date}"
 
 
-class AttendanceRecord(models.Model):
 
-    STATUS_CHOICES = [
-        ("PRESENT", "Present"),
-        ("ABSENT", "Absent"),
-    ]
-
-    student = models.ForeignKey(Student, on_delete=models.CASCADE)
-    date = models.DateField()
-    status = models.CharField(max_length=10, choices=STATUS_CHOICES)
-
-    class Meta:
-        unique_together = ("student", "date")
-    
 
 class Exam(models.Model):
 

@@ -25,12 +25,19 @@
                         <select name="assignment_id"
                                 class="form-select form-select-lg rounded-3"
                                 required>
-                            <option value="">Select</option>
-                            {% for a in assignments %}
-                            <option value="{{ a.id }}">
-                                {{ a.class_obj.name }} - {{ a.subject.name }}
-                            </option>
-                            {% endfor %}
+                          <option value="">Select Class</option>
+
+{% for a in assignments %}
+<option value="{{ a.id }}">
+{{ a.class_obj.name }} - {{ a.section.name }} ({{ a.subject.name }})
+</option>
+{% endfor %}
+
+{% for s in sections %}
+<option disabled>
+{{ s.class_obj.name }} - {{ s.name }} (Class Teacher)
+</option>
+{% endfor %}
                         </select>
                     </div>
 

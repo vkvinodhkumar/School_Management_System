@@ -197,19 +197,28 @@ def teacher_enter_marks(request):
 
     teacher = request.user
 
-    assignments = TeacherSubjectAssignment.objects.filter(teacher=teacher)
+    sections = Section.objects.filter(
+        class_teacher=teacher
+    ).select_related("class_obj")
 
-    class_ids = assignments.values_list("class_obj_id", flat=True)
-    section_ids = assignments.values_list("section_id", flat=True)
-    subject_ids = assignments.values_list("subject_id", flat=True)
+    section_id = request.GET.get("section_id") or request.POST.get("section_id")
 
-    students = Student.objects.filter(
-        class_obj_id__in=class_ids,
-        section_id__in=section_ids
-    )
+    students = Student.objects.none()
+    selected_section = None
 
-    subjects = Subject.objects.filter(id__in=subject_ids)
+    if section_id:
+        selected_section = Section.objects.filter(
+            id=section_id,
+            class_teacher=teacher
+        ).first()
 
+        if selected_section:
+            students = Student.objects.filter(
+                class_obj=selected_section.class_obj,
+                section=selected_section
+            )
+
+    subjects = Subject.objects.all()
     exams = Exam.objects.all()
 
     if request.method == "POST":
@@ -219,49 +228,42 @@ def teacher_enter_marks(request):
         exam_id = request.POST.get("exam_id")
         marks_value = request.POST.get("marks")
 
-        if not marks_value:
-            messages.error(request, "Marks required")
-            return redirect("teacher_enter_marks")
-
         student = get_object_or_404(Student, id=student_id)
         subject = get_object_or_404(Subject, id=subject_id)
         exam = get_object_or_404(Exam, id=exam_id)
 
         if int(marks_value) > exam.max_marks:
-            return render(request, "academics/teacher_marks.html", {
-                "students": students,
-                "subjects": subjects,
-                "exams": exams,
-                "error": f"Marks cannot exceed {exam.max_marks}"
+            return render(request,"academics/teacher_marks.html",{
+                "sections":sections,
+                "students":students,
+                "subjects":subjects,
+                "exams":exams,
+                "selected_section":selected_section,
+                "error":f"Marks cannot exceed {exam.max_marks}"
             })
 
         Mark.objects.update_or_create(
             student=student,
             subject=subject,
             exam=exam,
-            defaults={"marks": marks_value}
+            defaults={"marks":marks_value}
         )
 
         return redirect("teacher_enter_marks")
 
-    filter_student = request.GET.get("student")
+    saved_marks = Mark.objects.filter(
+        student__section__class_teacher=teacher
+    ).select_related("student","subject","exam")
 
-    if filter_student:
-        saved_marks = Mark.objects.filter(
-            student_id=filter_student
-        ).select_related("student", "subject", "exam")
-    else:
-        saved_marks = Mark.objects.filter(
-            student__class_obj_id__in=class_ids,
-            student__section_id__in=section_ids
-        ).select_related("student", "subject", "exam")
-
-    return render(request, "academics/teacher_marks.html", {
-        "students": students,
-        "subjects": subjects,
-        "exams": exams,
-        "saved_marks": saved_marks
+    return render(request,"academics/teacher_marks.html",{
+        "sections":sections,
+        "students":students,
+        "subjects":subjects,
+        "exams":exams,
+        "saved_marks":saved_marks,
+        "selected_section":selected_section
     })
+
 @role_required(["TEACHER"])
 def edit_mark(request, mark_id):
 
@@ -382,41 +384,44 @@ def teacher_dashboard(request):
 @role_required(["TEACHER"])
 def teacher_mark_attendance(request):
 
-    assignments = TeacherSubjectAssignment.objects.filter(
-        teacher=request.user
-    )
+    # SHOW ONLY CLASS TEACHER SECTIONS
+    sections = Section.objects.filter(
+        class_teacher=request.user
+    ).select_related("class_obj")
 
     students = None
-    selected_assignment = None
+    selected_section = None
     selected_date = None
 
     if request.method == "POST":
 
-        assignment_id = request.POST.get("assignment_id")
+        section_id = request.POST.get("section_id")
         date = request.POST.get("date")
 
-        selected_assignment = TeacherSubjectAssignment.objects.filter(
-            id=assignment_id,
-            teacher=request.user
+        selected_section = Section.objects.filter(
+            id=section_id,
+            class_teacher=request.user
         ).first()
 
-        if not selected_assignment:
+        if not selected_section:
             messages.error(request, "Invalid class.")
             return redirect("teacher_mark_attendance")
 
         selected_date = date
 
         students = Student.objects.filter(
-            class_obj=selected_assignment.class_obj,
-            section=selected_assignment.section
-        )
+            class_obj=selected_section.class_obj,
+            section=selected_section
+        ).order_by("full_name")
 
         if "submit_attendance" in request.POST:
 
             for student in students:
+
                 status = request.POST.get(f"status_{student.id}")
 
                 if status:
+
                     AttendanceRecord.objects.update_or_create(
                         student=student,
                         date=date,
@@ -426,17 +431,18 @@ def teacher_mark_attendance(request):
             messages.success(request, "Attendance saved.")
             return redirect("teacher_mark_attendance")
 
-    # ALWAYS SHOW HISTORY
     attendance_history = AttendanceRecord.objects.filter(
-        student__class_obj__teachersubjectassignment__teacher=request.user
+        student__section__class_teacher=request.user
     ).select_related("student").order_by("-date")
 
     return render(request, "academics/teacher_attendance.html", {
-        "assignments": assignments,
+
+        "sections": sections,
         "students": students,
-        "selected_assignment": selected_assignment,
+        "selected_section": selected_section,
         "selected_date": selected_date,
-        "attendance_history": attendance_history,
+        "attendance_history": attendance_history
+
     })
 
 
@@ -465,9 +471,13 @@ def edit_attendance(request, record_id):
 @role_required(["TEACHER"])
 def upload_homework(request):
 
-    assignments = TeacherSubjectAssignment.objects.filter(
+    subject_assignments = TeacherSubjectAssignment.objects.filter(
         teacher=request.user
-    )
+    ).select_related("class_obj", "section", "subject")
+
+    class_teacher_sections = Section.objects.filter(
+        class_teacher=request.user
+    ).select_related("class_obj")
 
     homeworks = Homework.objects.filter(
         teacher=request.user
@@ -480,25 +490,28 @@ def upload_homework(request):
         due_date = request.POST.get("due_date")
         file = request.FILES.get("file")
 
-        assignment = TeacherSubjectAssignment.objects.get(
+        assignment = TeacherSubjectAssignment.objects.filter(
             id=assignment_id,
             teacher=request.user
-        )
+        ).first()
 
-        Homework.objects.create(
-            teacher=request.user,
-            class_obj=assignment.class_obj,
-            section=assignment.section,
-            subject=assignment.subject,
-            title=title,
-            due_date=due_date,
-            file=file
-        )
+        if assignment:
+
+            Homework.objects.create(
+                teacher=request.user,
+                class_obj=assignment.class_obj,
+                section=assignment.section,
+                subject=assignment.subject,
+                title=title,
+                due_date=due_date,
+                file=file
+            )
 
         return redirect("upload_homework")
 
     return render(request, "academics/upload_homework.html", {
-        "assignments": assignments,
+        "assignments": subject_assignments,
+        "sections": class_teacher_sections,
         "homeworks": homeworks
     })
 
@@ -579,9 +592,13 @@ def download_report_card(request):
 @role_required(["TEACHER"])
 def upload_question_paper(request):
 
-    assignments = TeacherSubjectAssignment.objects.filter(
+    subject_assignments = TeacherSubjectAssignment.objects.filter(
         teacher=request.user
-    )
+    ).select_related("class_obj", "section", "subject")
+
+    class_teacher_sections = Section.objects.filter(
+        class_teacher=request.user
+    ).select_related("class_obj")
 
     papers = QuestionPaper.objects.filter(
         teacher=request.user
@@ -598,10 +615,11 @@ def upload_question_paper(request):
         ).first()
 
         if assignment and file:
+
             QuestionPaper.objects.create(
                 teacher=request.user,
                 class_obj=assignment.class_obj,
-                section=assignment.section,   # ← ADD THIS
+                section=assignment.section,
                 subject=assignment.subject,
                 file=file
             )
@@ -609,9 +627,11 @@ def upload_question_paper(request):
         return redirect("upload_question_paper")
 
     return render(request, "academics/upload_question_paper.html", {
-        "assignments": assignments,
+        "assignments": subject_assignments,
+        "sections": class_teacher_sections,
         "papers": papers
     })
+
 @role_required(["STUDENT"])
 def submit_homework(request, homework_id):
 

@@ -2,71 +2,87 @@
 {% block content %}
 
 <div class="row justify-content-center">
-    <div class="col-lg-10">
+<div class="col-lg-10">
 
-        <div class="mb-4">
-            <h2 class="fw-bold">Teacher Dashboard</h2>
-        </div>
+<div class="mb-4">
+<h2 class="fw-bold">Teacher Dashboard</h2>
+</div>
 
-        <!-- Assigned Subjects -->
-        <div class="card border-0 shadow-sm rounded-4 mb-4">
 
-            <div class="card-header bg-primary text-white rounded-top-4">
-                <h5 class="mb-0">Assigned Subjects</h5>
-            </div>
+<!-- ASSIGNED SUBJECTS -->
 
-            <div class="card-body">
+<div class="card border-0 shadow-sm rounded-4 mb-4">
 
-                <ul class="list-group list-group-flush">
+<div class="card-header bg-primary text-white rounded-top-4">
+<h5 class="mb-0">Assigned Subjects</h5>
+</div>
 
-                    {% for subject in assigned_subjects %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>
-                            <strong>{{ subject.subject.name }}</strong>
-                            <span class="text-muted">
-                                (Class: {{ subject.class_obj.name }})
-                            </span>
-                        </span>
-                    </li>
+<div class="card-body">
 
-                    {% empty %}
-                    <li class="list-group-item text-muted">
-                        No subjects assigned
-                    </li>
-                    {% endfor %}
+<ul class="list-group list-group-flush">
 
-                </ul>
+{% for subject in assigned_subjects %}
 
-            </div>
-        </div>
+<li class="list-group-item d-flex justify-content-between align-items-center">
 
-        <!-- Quick Actions -->
-        <div class="card border-0 shadow-sm rounded-4 p-4">
+<span>
 
-            <h5 class="mb-3 fw-semibold">Quick Actions</h5>
+<strong>{{ subject.subject.name }}</strong>
 
-            <div class="d-flex flex-wrap gap-3">
+<span class="text-muted">
 
-                <a href="{% url 'teacher_mark_attendance' %}"
-                   class="btn btn-success btn-lg rounded-3 px-4">
-                    Mark Attendance
-                </a>
+(Class: {{ subject.class_obj.name }} - {{ subject.section.name }})
 
-                <a href="{% url 'teacher_enter_marks' %}"
-                   class="btn btn-info btn-lg rounded-3 px-4 text-white">
-                    Enter Marks
-                </a>
+</span>
 
-                <a href="{% url 'upload_homework' %}"
-                   class="btn btn-warning btn-lg rounded-3 px-4">
-                    Upload Homework
-                </a>
+</span>
 
-            </div>
+</li>
 
-        </div>
+{% empty %}
 
-    </div>
+<li class="list-group-item text-muted">
+No subjects assigned
+</li>
+
+{% endfor %}
+
+</ul>
+
+</div>
+
+</div>
+
+
+
+<!-- QUICK ACTIONS -->
+
+<div class="card border-0 shadow-sm rounded-4 p-4">
+
+<h5 class="mb-3 fw-semibold">Quick Actions</h5>
+
+<div class="d-flex flex-wrap gap-3">
+
+<a href="{% url 'teacher_mark_attendance' %}"
+class="btn btn-success btn-lg rounded-3 px-4">
+Mark Attendance
+</a>
+
+<a href="{% url 'teacher_enter_marks' %}"
+class="btn btn-info btn-lg rounded-3 px-4 text-white">
+Enter Marks
+</a>
+
+<a href="{% url 'upload_homework' %}"
+class="btn btn-warning btn-lg rounded-3 px-4">
+Upload Homework
+</a>
+
+</div>
+
+</div>
+
+</div>
 </div>
 
 {% endblock %}

@@ -72,15 +72,18 @@ class Student(models.Model):
         return self.full_name
     
     def attendance_percentage(self):
-        total_sessions = self.attendancerecord_set.count()
+
+        total_sessions = self.attendance_records.count()
 
         if total_sessions == 0:
             return 0
 
-        present_count = self.attendancerecord_set.filter(status="PRESENT").count()
+        present_count = self.attendance_records.filter(
+            status="PRESENT"
+        ).count()
 
         return round((present_count / total_sessions) * 100, 2)
-    
+        
     def low_attendance(self):
         return self.attendance_percentage() < 75
 
